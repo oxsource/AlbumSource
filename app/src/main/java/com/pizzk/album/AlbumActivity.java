@@ -106,7 +106,7 @@ public class AlbumActivity extends AppCompatActivity {
         String symbol = " | ";
         StringBuilder sbf = new StringBuilder();
         for (Map.Entry<String, String> e : buckets) {
-            sbf.append(e.getValue()).append(symbol);
+            sbf.append(e.getValue()).append(e.getKey()).append(symbol);
         }
         wholeBucketText = sbf.subSequence(0, sbf.length() - symbol.length()).toString();
     }
@@ -115,7 +115,7 @@ public class AlbumActivity extends AppCompatActivity {
         try {
             Map.Entry<String, String> e = buckets.get(index);
             String bucketId = e.getKey();
-            String bucketName = e.getValue();
+            String bucketName = e.getValue() + bucketId;
             int sIndex = wholeBucketText.indexOf(bucketName);
             SpannableString s = new SpannableString(wholeBucketText);
             s.setSpan(new ForegroundColorSpan(Color.RED), sIndex, sIndex + bucketName.length(), SpannedString.SPAN_INCLUSIVE_INCLUSIVE);
