@@ -33,6 +33,7 @@ public abstract class MediaSource implements IMediaSource {
 
     public void close() {
         invalidateCursor();
+        invalidateCache();
         mResolver = null;
     }
 
