@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class MediaSource implements IMediaSource {
-    private static final String TAG = "MediaSource";
+    public static final String TAG = "MediaSource";
     private static final int CACHE_CAPACITY = 512;
     private final LruCache<Integer, Media> mCache = new LruCache<>(CACHE_CAPACITY);
 

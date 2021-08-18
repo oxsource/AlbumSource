@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.SpannedString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.pizzk.media.source.core.MediaSource;
 import com.pizzk.media.source.impl.CombMediaSource;
 
 import java.util.ArrayList;
@@ -38,8 +40,6 @@ public class AlbumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         adapter.setContext(getBaseContext());
-        mediaSource = new CombMediaSource(getBaseContext());
-        fillBuckets(mediaSource.getBucketIds());
         //
         tvBucket = findViewById(R.id.tvBucket);
         Button btNext = findViewById(R.id.btNext);
@@ -82,9 +82,18 @@ public class AlbumActivity extends AppCompatActivity {
                 mGridView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
-        //
-        adapter.setSource(mediaSource);
-        updateSelectBucket();
+        //create media source
+        new Thread(() -> {
+            mediaSource = new CombMediaSource(getBaseContext());
+            //active other children source query
+            int count = mediaSource.count();
+            Log.d(MediaSource.TAG, "CombMediaSource prepared, total count=" + count);
+            runOnUiThread(() -> {
+                fillBuckets(mediaSource.getBucketIds());
+                adapter.setSource(mediaSource);
+                updateSelectBucket();
+            });
+        }).start();
     }
 
     private void fillBuckets(Map<String, String> bucketIds) {
