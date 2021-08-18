@@ -16,9 +16,9 @@ public abstract class MediaSource implements IMediaSource {
     private final LruCache<Integer, Media> mCache = new LruCache<>(CACHE_CAPACITY);
 
     protected ContentResolver mResolver;
-    protected boolean isAsc;
+    public boolean isAsc;
     protected final Uri mBaseUri;
-    protected final String mBucketId;
+    public final String mBucketId;
     protected Cursor mCursor;
 
     public MediaSource(ContentResolver resolver, Uri uri, boolean asc, String bucketId) {

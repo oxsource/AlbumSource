@@ -30,9 +30,8 @@ class AlbumAdapter extends BaseAdapter {
         this.context = context;
     }
 
-    public void swapSource(MediaSource source) {
+    public void setSource(MediaSource source) {
         this.source = source;
-        notifyDataSetChanged();
     }
 
     /**

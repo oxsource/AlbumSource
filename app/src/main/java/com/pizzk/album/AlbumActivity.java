@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.pizzk.media.source.core.MediaSource;
 import com.pizzk.media.source.impl.CombMediaSource;
 
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class AlbumActivity extends AppCompatActivity {
     private GridView mGridView;
     private final AlbumAdapter adapter = new AlbumAdapter();
     //
-    private CombMediaSource combMediaSource;
+    private CombMediaSource mediaSource;
     private final List<Map.Entry<String, String>> buckets = new ArrayList<>();
     private String wholeBucketText = "";
     //
@@ -39,8 +38,8 @@ public class AlbumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         adapter.setContext(getBaseContext());
-        combMediaSource = new CombMediaSource(getBaseContext());
-        fillBuckets(combMediaSource.getBucketIds());
+        mediaSource = new CombMediaSource(getBaseContext());
+        fillBuckets(mediaSource.getBucketIds());
         //
         tvBucket = findViewById(R.id.tvBucket);
         Button btNext = findViewById(R.id.btNext);
@@ -53,7 +52,6 @@ public class AlbumActivity extends AppCompatActivity {
             index = (index - 1 + buckets.size()) % buckets.size();
             updateSelectBucket();
         });
-        updateSelectBucket();
         //
         mGridView = findViewById(R.id.vGrid);
         mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -84,6 +82,9 @@ public class AlbumActivity extends AppCompatActivity {
                 mGridView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
+        //
+        adapter.setSource(mediaSource);
+        updateSelectBucket();
     }
 
     private void fillBuckets(Map<String, String> bucketIds) {
@@ -110,8 +111,8 @@ public class AlbumActivity extends AppCompatActivity {
             SpannableString s = new SpannableString(wholeBucketText);
             s.setSpan(new ForegroundColorSpan(Color.RED), sIndex, sIndex + bucketName.length(), SpannedString.SPAN_INCLUSIVE_INCLUSIVE);
             tvBucket.setText(s);
-            MediaSource source = combMediaSource.bucket(bucketId);
-            adapter.swapSource(source);
+            mediaSource.use(bucketId);
+            adapter.notifyDataSetChanged();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -120,6 +121,6 @@ public class AlbumActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        combMediaSource.close();
+        mediaSource.close();
     }
 }
