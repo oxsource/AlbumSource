@@ -17,12 +17,12 @@ public class CombMediaSource extends SimpleMediaSource {
     private int offset = 0;
 
     public CombMediaSource(Context context) {
-        super(context.getContentResolver(), MediaStore.Files.getContentUri("external"), false, null);
+        super(context.getContentResolver(), MediaStore.Files.getContentUri("external"), false, null, new SimpleMediaFactory());
         ContentResolver resolver = context.getContentResolver();
         buckets = super.getBucketIds();
         for (Map.Entry<String, String> e : buckets.entrySet()) {
             String bucketId = e.getKey();
-            sources.add(new SimpleMediaSource(resolver, mBaseUri, true, bucketId));
+            sources.add(new SimpleMediaSource(resolver, mBaseUri, true, bucketId, new SimpleMediaFactory()));
         }
     }
 

@@ -3,20 +3,20 @@ package com.pizzk.media.source.core;
 import android.net.Uri;
 
 public class Media implements IMedia {
-    protected final MediaSource mContainer;
-    protected final long mId;
-    protected final Uri mUri;
-    protected final String mBucketId;
-    protected final int mIndex;
-    private final String mTitle;
-    private final long mDateTaken;
-    private final long mDuration;
-    protected String mMimeType;
-    protected int mMediaType;
+    private MediaSource mContainer;
+    private long mId;
+    private Uri mUri;
+    private String mBucketId;
+    private int mIndex;
+    private String mTitle;
+    private long mDateTaken;
+    private long mDuration;
+    private String mMimeType;
+    private int mMediaType;
 
-    public Media(MediaSource container, long id, String bucketId,
-                 int index, String name, long dateTaken,
-                 long duration, String mimeType, int mediaType) {
+    public Media of(MediaSource container, long id, String bucketId,
+                    int index, String name, long dateTaken,
+                    long duration, String mimeType, int mediaType) {
         mContainer = container;
         mId = id;
         mUri = container.contentUri(id);
@@ -27,6 +27,7 @@ public class Media implements IMedia {
         mDuration = duration;
         mMimeType = mimeType;
         mMediaType = mediaType;
+        return this;
     }
 
     @Override
@@ -61,7 +62,7 @@ public class Media implements IMedia {
     }
 
     @Override
-    public long index() {
+    public int index() {
         return mIndex;
     }
 

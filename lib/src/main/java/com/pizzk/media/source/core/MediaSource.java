@@ -12,23 +12,23 @@ import java.util.regex.Pattern;
 
 public abstract class MediaSource implements IMediaSource {
     public static final String TAG = "MediaSource";
-    private static final int CACHE_CAPACITY = 512;
-    private final LruCache<Integer, Media> mCache = new LruCache<>(CACHE_CAPACITY);
 
     protected ContentResolver mResolver;
+    protected final MediaFactory mFactory;
     public boolean isAsc;
     protected final Uri mBaseUri;
     public final String mBucketId;
     protected Cursor mCursor;
 
-    public MediaSource(ContentResolver resolver, Uri uri, boolean asc, String bucketId) {
+    public MediaSource(ContentResolver resolver, Uri uri, boolean asc, String bucketId, MediaFactory factory) {
         isAsc = asc;
         mBaseUri = uri;
         mBucketId = bucketId;
         mResolver = resolver;
+        mFactory = factory;
         // list. After we implement the media list state, we can remove this
         // kind of usage.
-        mCache.clear();
+        mFactory.clear();
     }
 
     public void close() {
@@ -72,13 +72,13 @@ public abstract class MediaSource implements IMediaSource {
     }
 
     public IMedia get(int i) {
-        Media result = mCache.get(i);
+        Media result = mFactory.get(i);
         if (null != result) return result;
         Cursor cursor = getCursor();
         if (cursor == null) return null;
         synchronized (this) {
-            result = cursor.moveToPosition(i) ? loadFromCursor(cursor) : null;
-            mCache.put(i, result);
+            result = cursor.moveToPosition(i) ? mFactory.create(this, cursor) : null;
+            mFactory.put(i, result);
         }
         return result;
     }
@@ -99,8 +99,6 @@ public abstract class MediaSource implements IMediaSource {
 
     protected abstract Cursor createCursor();
 
-    protected abstract Media loadFromCursor(Cursor cursor);
-
     protected abstract long getMediaId(Cursor cursor);
 
     protected void invalidateCursor() {
@@ -114,7 +112,7 @@ public abstract class MediaSource implements IMediaSource {
     }
 
     protected void invalidateCache() {
-        mCache.clear();
+        mFactory.clear();
     }
 
     private static final Pattern sPathWithId = Pattern.compile("(.*)/\\d+");
@@ -152,10 +150,10 @@ public abstract class MediaSource implements IMediaSource {
             cursor.moveToPosition(-1);
             for (int i = 0; cursor.moveToNext(); ++i) {
                 if (getMediaId(cursor) != matchId) continue;
-                Media media = mCache.get(i);
+                Media media = mFactory.get(i);
                 if (media == null) {
-                    media = loadFromCursor(cursor);
-                    mCache.put(i, media);
+                    media = mFactory.create(this, cursor);
+                    mFactory.put(i, media);
                 }
                 return media;
             }
@@ -164,7 +162,7 @@ public abstract class MediaSource implements IMediaSource {
     }
 
     public int getIndex(IMedia media) {
-        return ((Media) media).mIndex;
+        return media.index();
     }
 
     // This provides a default sorting order string for subclasses.

@@ -11,7 +11,7 @@ public interface IMedia {
 
     String bucketId();
 
-    long index();
+    int index();
 
     String title();
 
